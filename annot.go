@@ -5,9 +5,13 @@ package poppler
 // #include <glib.h>
 // #include <cairo.h>
 //
-//PopplerAnnotTextMarkup *wrap_POPPLER_ANNOT_TEXT_MARKUP(PopplerAnnot *annot) {
-//  return POPPLER_ANNOT_TEXT_MARKUP(annot);
-//}
+// /* macro wrappings */
+// gboolean wrap_POPPLER_IS_ANNOT_TEXT_MARKUP(PopplerAnnot *annot){
+//   return POPPLER_IS_ANNOT_TEXT_MARKUP(annot);
+// }
+// PopplerAnnotTextMarkup *wrap_POPPLER_ANNOT_TEXT_MARKUP(PopplerAnnot *annot) {
+//	return POPPLER_ANNOT_TEXT_MARKUP(annot);
+// }
 import "C"
 
 import "unsafe"
@@ -132,12 +136,19 @@ func (a *Annot) Flags() AnnotFlag {
 }
 
 func (a *Annot) Quads() []Quad {
+	if C.wrap_POPPLER_IS_ANNOT_TEXT_MARKUP(a.am.annot) == C.FALSE {
+		return nil
+	}
+
+
 	textMarkup := C.wrap_POPPLER_ANNOT_TEXT_MARKUP(a.am.annot)
 
 	q := C.poppler_annot_text_markup_get_quadrilaterals(textMarkup)
-	defer C.g_array_free(q, 1)
 
 	quads := gArrayToQuads(q)
+
+	C.g_array_free(q, 1)
+
 	return quads
 }
 
