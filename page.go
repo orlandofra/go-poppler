@@ -136,10 +136,12 @@ func (p *Page) TextLayoutAndAttrs() (result []TextEl) {
 
 func (p *Page) Close() {
 	p.closeAnnotMappings()
-	C.g_object_unref(C.gpointer(p.p))
 
-	/* avoid double free */
-	p.p = nil
+	if p.p != nil {
+		C.g_object_unref(C.gpointer(p.p))
+		/* avoid double free */
+		p.p = nil
+	}
 }
 
 // Converts a page into SVG and saves to file.

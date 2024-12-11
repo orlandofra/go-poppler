@@ -14,8 +14,8 @@ import (
 )
 
 type Document struct {
-	doc                poppDoc
-	openedPopplerPages []*C.struct__PopplerPage
+	doc			poppDoc
+	openedPages		[]*Page
 }
 
 type DocumentInfo struct {
@@ -47,12 +47,13 @@ func (d *Document) GetNPages() int {
 
 func (d *Document) GetPage(i int) (page *Page) {
 	p := C.poppler_document_get_page(d.doc, C.int(i))
-	d.openedPopplerPages = append(d.openedPopplerPages, p)
 
 	page = &Page{
 		p:                p,
 		openedPopplerAnnotMappings: []*C.struct__PopplerAnnotMapping{},
 	}
+	d.openedPages = append(d.openedPages, page)
+
 	return page
 }
 
@@ -65,10 +66,12 @@ func (d *Document) GetNAttachments() int {
 }
 
 func (d *Document) Close() {
-	for i := 0; i < len(d.openedPopplerPages); i++ {
-		C.g_object_unref(C.gpointer(d.openedPopplerPages[i]))
+
+	for i := 0; i < len(d.openedPages); i++ {
+		d.openedPages[i].Close()
 	}
-	d.openedPopplerPages = []*C.struct__PopplerPage{}
+	d.openedPages = []*Page{}
+
 	C.g_object_unref(C.gpointer(d.doc))
 }
 
