@@ -50,7 +50,7 @@ func (d *Document) GetPage(i int) (page *Page) {
 
 	page = &Page{
 		p:                p,
-		openedPopplerAnnotMappings: []*C.struct__PopplerAnnotMapping{},
+		openedAnnots: []*Annot{},
 	}
 	d.openedPages = append(d.openedPages, page)
 

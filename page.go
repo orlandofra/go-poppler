@@ -12,7 +12,7 @@ import "github.com/ungerik/go-cairo"
 
 type Page struct {
 	p *C.struct__PopplerPage
-	openedPopplerAnnotMappings []*C.struct__PopplerAnnotMapping
+	openedAnnots []*Annot
 }
 
 func (p *Page) Text() string {
@@ -168,33 +168,36 @@ func (p *Page) ConvertToSVG(filename string){
 }
 
 func (p *Page) closeAnnotMappings(){
-	for i := 0; i < len(p.openedPopplerAnnotMappings); i++ {
-		C.poppler_annot_mapping_free(p.openedPopplerAnnotMappings[i])
+	for i := 0; i < len(p.openedAnnots); i++ {
+		p.openedAnnots[i].Close()
 	}
 
-	p.openedPopplerAnnotMappings = []*C.struct__PopplerAnnotMapping{}
+	p.openedAnnots = []*Annot{}
 }
 
 func (p *Page) GetAnnots() (Annots []Annot) {
 	var annots []Annot
 
 	annotGlist := C.poppler_page_get_annot_mapping(p.p)
+	defer C.g_list_free(annotGlist)
 
 	p.closeAnnotMappings()
 	for annotGlist != nil {
 		popplerAnnot := (*C.PopplerAnnotMapping)(annotGlist.data)
-		p.openedPopplerAnnotMappings = append(p.openedPopplerAnnotMappings, popplerAnnot)
 
 		annot := Annot{
 			am: popplerAnnot,
 		}
-		
+
+		/* Maybe we can used openedAnnots instead of annots + openedAnnots
+		 */
+		p.openedAnnots = append(p.openedAnnots, &annot)
+
 		annots = append(annots, annot)
 
 		annotGlist = annotGlist.next
 	}
 
-	C.g_list_free(annotGlist)
 
 	return annots
 }
