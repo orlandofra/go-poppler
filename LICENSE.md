@@ -1,4 +1,5 @@
-Copyright (c) 2015-2020 Sergey Cherepanov
+Copyright (c) 2024 Francesco Orlando<br>
+Copyright (c) 2015-2024 Sergey Cherepanov
 
 ### GNU GENERAL PUBLIC LICENSE
 
