@@ -172,32 +172,35 @@ func (p *Page) closeAnnotMappings(){
 		p.openedAnnots[i].Close()
 	}
 
-	p.openedAnnots = []*Annot{}
+	p.openedAnnots = nil
+
 }
 
-func (p *Page) GetAnnots() (Annots []Annot) {
-	var annots []Annot
+func (p *Page) GetAnnots() (Annots []*Annot) {
+	var annots []*Annot
 
 	annotGlist := C.poppler_page_get_annot_mapping(p.p)
 	defer C.g_list_free(annotGlist)
 
 	p.closeAnnotMappings()
+
 	for annotGlist != nil {
 		popplerAnnot := (*C.PopplerAnnotMapping)(annotGlist.data)
 
-		annot := Annot{
+
+		annot := &Annot{
 			am: popplerAnnot,
 		}
 
 		/* Maybe we can used openedAnnots instead of annots + openedAnnots
 		 */
-		p.openedAnnots = append(p.openedAnnots, &annot)
 
 		annots = append(annots, annot)
+		p.openedAnnots = append(p.openedAnnots, annot)
+
 
 		annotGlist = annotGlist.next
 	}
-
 
 	return annots
 }

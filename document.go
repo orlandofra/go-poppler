@@ -49,8 +49,8 @@ func (d *Document) GetPage(i int) (page *Page) {
 	p := C.poppler_document_get_page(d.doc, C.int(i))
 
 	page = &Page{
-		p:                p,
-		openedAnnots: []*Annot{},
+		p:              p,
+		openedAnnots:	nil,
 	}
 	d.openedPages = append(d.openedPages, page)
 

@@ -143,7 +143,7 @@ func (a *Annot) Quads() []Quad {
 
 func (a *Annot) Close() {
 	if a.am != nil {
-		C.poppler_annot_mapping_free((*C.struct__PopplerAnnotMapping)(a.am))
+		C.poppler_annot_mapping_free(a.am)
 		a.am = nil
 	}
 }
